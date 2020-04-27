@@ -8,6 +8,7 @@ import (
 
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/encoding/korean"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -26,6 +27,7 @@ var codecTable = [...]*codecSupport{
 	&codecSupport{toUtf16BENoBom, fromUtf16},
 	&codecSupport{toUtf8, fromUtf8},
 	&codecSupport{toUtf8Sig, fromUtf8},
+	&codecSupport{toEUCKR, fromEUCKR},
 }
 
 //Codecs
@@ -40,6 +42,8 @@ const (
 	UTF16BE  = 4
 	UTF8     = 5
 	UTF8Sig  = 6
+	EUCKR    = 7
+	C949     = 7
 )
 
 //Replace method
@@ -57,6 +61,8 @@ var codecMap = map[string]int{
 	"utf16":     2,
 	"utf-16-le": 3,
 	"utf-16-be": 4,
+	"euckr":     7,
+	"c949":      7,
 }
 
 //Encode encode string to []byte
@@ -153,4 +159,12 @@ func fromUtf8(b []byte) string {
 		return string(b[3:])
 	}
 	return string(b)
+}
+
+func toEUCKR(s string, method int) []byte {
+	return utf8ToCodec(korean.EUCKR.NewEncoder(), s, method)
+}
+
+func fromEUCKR(b []byte) string {
+	return codecToUtf8(korean.EUCKR.NewDecoder(), b)
 }
